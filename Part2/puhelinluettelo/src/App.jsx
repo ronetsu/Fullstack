@@ -1,10 +1,11 @@
 import {useEffect, useState } from 'react'
+import axios from 'axios'
 import Phonebook from './components/Phonebook'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 
-const App = (props) => {
-  const [persons, setPersons] = useState(props.persons)
+const App = () => {
+  const [persons, setPersons] = useState([])
   const [filteredPersons, setFilteredPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
@@ -13,6 +14,14 @@ const App = (props) => {
   useEffect(() => {
     setFilteredPersons(persons);
   }, [persons])
+
+  useEffect(() => {
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        setPersons(response.data)
+      })
+  }, [])
 
   const addPerson = (event) => {
     event.preventDefault()
