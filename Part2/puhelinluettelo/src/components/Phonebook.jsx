@@ -2,10 +2,10 @@ const Phonebook = ({ persons, handleDelete }) => {
   return (
     <div>
       {persons.map((person, index) => (
-        <>
-          <p key={person.id || index}>{person.name} {person.number}</p>
+        <div key={person.id || index}>
+          <p>{person.name} {person.number}</p>
           <button onClick={() => handleDelete(person.id)}>delete</button>
-        </>
+        </div>
       ))}
     </div>
   );
