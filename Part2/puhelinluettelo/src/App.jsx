@@ -3,6 +3,8 @@ import Phonebook from './components/Phonebook'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import personService from './services/persons'
+import Notification from './components/Notification'
+import './index.css'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -10,6 +12,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [subString, setSubString] = useState('')
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [messageVisibility, setMessageVisibility] = useState(false)
 
   useEffect(() => {
     setFilteredPersons(persons);
@@ -23,6 +27,17 @@ const App = () => {
       })
   }, [])
 
+  useEffect(() => {
+    if (errorMessage) {
+      setMessageVisibility(true);
+      const timer = setTimeout(() => {
+        setMessageVisibility(false);
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [errorMessage]);
+
   const addPerson = (event) => {
     event.preventDefault()
     const personObject = {
@@ -31,21 +46,22 @@ const App = () => {
       }
 
     if (persons.some(person => person.name === newName)) {
-      if (confirm(`${newName} is already added to phonebook, replace the old
-      number with a new one?`)) {
-        const person = persons.find(p => p.name === newName)
-        const changedPerson = { ...person, number: newNumber }
+      if (confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        setErrorMessage(`Changed phone number for ${newName}`);
+
+        const person = persons.find(p => p.name === newName);
+        const changedPerson = { ...person, number: newNumber };
         personService.update(person.id, changedPerson)
         .then(returnedPerson => {
-          setPersons(prevPersons => prevPersons.map(p => p.id !== person.id ? p : returnedPerson))
-          setFilteredPersons(prevPersons => prevPersons.map(p => p.id !== person.id ? p : returnedPerson))
-          setNewName('')
-          setNewNumber('')
-        })
+          setPersons(prevPersons => prevPersons.map(p => p.id !== person.id ? p : returnedPerson));
+          setFilteredPersons(prevPersons => prevPersons.map(p => p.id !== person.id ? p : returnedPerson));
+          setNewName('');
+          setNewNumber('');
+        });
       }
-      console.log(persons)
+      console.log(persons);
     } else {
-      
+      setErrorMessage(`Added ${newName}`);
       personService
         .create(personObject)
         .then(returnedPerson => {
@@ -68,6 +84,7 @@ const App = () => {
           setFilteredPersons(persons.filter(p => p.id !== id))
         })
     }
+    setErrorMessage(`Deleted ${newName}`);
   }
 
   const handlePersonChange = (event) => {
@@ -90,6 +107,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      {messageVisibility && <Notification message={errorMessage} />}
       <Filter filter={subString} handleFilterChange={handleFilterChange} />
       <h2>add a new</h2>
       <PersonForm 
