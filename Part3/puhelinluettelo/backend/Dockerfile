@@ -4,4 +4,4 @@ WORKDIR /app
 
 COPY . .
 
-CMD ["node", "backend/index.js"]
+CMD ["node", "index.js"]
