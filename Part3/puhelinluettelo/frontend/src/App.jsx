@@ -84,6 +84,7 @@ const App = () => {
           setFilteredPersons(persons.filter(p => p.id !== id))
         })
     }
+    console.log("Alisa haisee kakalle")
     setErrorMessage(`Deleted ${newName}`);
   }
 

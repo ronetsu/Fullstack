@@ -26,7 +26,6 @@ let persons = [
 ];
 
 app.use(express.static("dist"));
-app.use(express.static("public"));
 const cors = require("cors");
 
 morgan.token("body", (req, res) => JSON.stringify(req.body));
@@ -38,10 +37,12 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/api/persons", (req, res) => {
+  console.log("kakki1");
   res.json(persons);
 });
 
 app.get("/api/persons/:id", (request, response) => {
+  console.log("kakki2");
   const id = Number(request.params.id);
   const person = persons.find((person) => {
     console.log(person.id, typeof person.id, id, typeof id, person.id === id);
@@ -55,13 +56,14 @@ app.get("/api/persons/:id", (request, response) => {
 });
 
 app.delete("/api/persons/:id", (request, response) => {
+  console.log("kakki3");
   const id = Number(request.params.id);
   persons = persons.filter((person) => person.id !== id);
-
-  response.status(204).end();
+  console.log(persons);
 });
 
 app.post("/api/persons", (request, response) => {
+  console.log("kakki4");
   const body = request.body;
 
   if (!body.name || !body.number) {

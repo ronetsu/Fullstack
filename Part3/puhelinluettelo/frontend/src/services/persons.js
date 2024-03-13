@@ -13,6 +13,7 @@ const create = async (newObject) => {
 };
 
 const remove = (id) => {
+  console.log("NO EI VAAN");
   const request = axios.delete(`${baseUrl}/${id}`);
   return request.then((response) => response.data);
 };
