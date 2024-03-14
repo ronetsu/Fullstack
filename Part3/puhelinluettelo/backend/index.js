@@ -36,13 +36,41 @@ app.use(
 app.use(cors());
 app.use(express.json());
 
+const mongoose = require("mongoose");
+
+const password = "Ukkoliini12";
+const url = `mongodb+srv://ronjalipsonen:${password}@cluster0.wzjytct.mongodb.net/personApp?retryWrites=true&w=majority`;
+
+mongoose.set("strictQuery", false);
+mongoose.connect(url);
+
+const personSchema = new mongoose.Schema({
+  name: String,
+  number: String,
+});
+
+personSchema.set("toJSON", {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
+  },
+});
+
+const Person = mongoose.model("Person", personSchema);
+
+app.get("/api/persons", (req, res) => {
+  Person.find({}).then((persons) => {
+    res.json(persons);
+  });
+});
+
 app.get("/api/persons", (req, res) => {
   console.log("kakki1");
   res.json(persons);
 });
 
 app.get("/api/persons/:id", (request, response) => {
-  console.log("kakki2");
   const id = Number(request.params.id);
   const person = persons.find((person) => {
     console.log(person.id, typeof person.id, id, typeof id, person.id === id);
@@ -56,14 +84,12 @@ app.get("/api/persons/:id", (request, response) => {
 });
 
 app.delete("/api/persons/:id", (request, response) => {
-  console.log("kakki3");
   const id = Number(request.params.id);
   persons = persons.filter((person) => person.id !== id);
   console.log(persons);
 });
 
 app.post("/api/persons", (request, response) => {
-  console.log("kakki4");
   const body = request.body;
 
   if (!body.name || !body.number) {
