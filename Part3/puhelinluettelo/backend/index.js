@@ -2,28 +2,11 @@ const express = require("express");
 const morgan = require("morgan");
 const app = express();
 
-let persons = [
-  {
-    id: 1,
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: 2,
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: 3,
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: 4,
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
+const path = require("path");
+console.log("Resolved path to .env file:", path.resolve(__dirname, "../.env"));
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+console.log("MongoDB URI:", process.env.MONGODB_URI);
+const Person = require("./models/person");
 
 app.use(express.static("dist"));
 const cors = require("cors");
@@ -36,57 +19,32 @@ app.use(
 app.use(cors());
 app.use(express.json());
 
-const mongoose = require("mongoose");
-
-const password = "Ukkoliini12";
-const url = `mongodb+srv://ronjalipsonen:${password}@cluster0.wzjytct.mongodb.net/personApp?retryWrites=true&w=majority`;
-
-mongoose.set("strictQuery", false);
-mongoose.connect(url);
-
-const personSchema = new mongoose.Schema({
-  name: String,
-  number: String,
-});
-
-personSchema.set("toJSON", {
-  transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString();
-    delete returnedObject._id;
-    delete returnedObject.__v;
-  },
-});
-
-const Person = mongoose.model("Person", personSchema);
-
 app.get("/api/persons", (req, res) => {
   Person.find({}).then((persons) => {
     res.json(persons);
   });
 });
 
-app.get("/api/persons", (req, res) => {
-  console.log("kakki1");
-  res.json(persons);
-});
-
 app.get("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  const person = persons.find((person) => {
-    console.log(person.id, typeof person.id, id, typeof id, person.id === id);
-    return person.id === id;
-  });
-  if (person) {
+  Person.findById(request.params.id).then((person) => {
     response.json(person);
-  } else {
-    response.status(404).end();
-  }
+  });
+  console.log(person.id, typeof person.id, id, typeof id, person.id === id);
 });
 
 app.delete("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  persons = persons.filter((person) => person.id !== id);
-  console.log(persons);
+  Person.findByIdAndDelete(request.params.id)
+    .then((result) => {
+      if (result) {
+        response.status(204).end();
+      } else {
+        response.status(404).json({ error: "Person not found" });
+      }
+    })
+    .catch((error) => {
+      console.error("Error removing person:", error);
+      response.status(500).json({ error: "Internal Server Error" });
+    });
 });
 
 app.post("/api/persons", (request, response) => {
@@ -110,8 +68,9 @@ app.post("/api/persons", (request, response) => {
     id: Math.floor(Math.random() * 1000),
   };
 
-  persons = persons.concat(person);
-  response.json(person);
+  person.save().then((savedPerson) => {
+    response.json(savedPerson);
+  });
 });
 
 app.get("/info", (request, response) => {
@@ -120,7 +79,7 @@ app.get("/info", (request, response) => {
   );
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

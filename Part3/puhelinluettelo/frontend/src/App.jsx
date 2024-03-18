@@ -76,6 +76,7 @@ const App = () => {
 
   const handleDelete = (id) => {
     const person = persons.find(p => p.id === id)
+    const personName = person.name;
     if (window.confirm(`Delete ${person.name}?`)) {
       personService
         .remove(id)
@@ -84,8 +85,7 @@ const App = () => {
           setFilteredPersons(persons.filter(p => p.id !== id))
         })
     }
-    console.log("Alisa haisee kakalle")
-    setErrorMessage(`Deleted ${newName}`);
+    setErrorMessage(`Deleted ${personName}`);
   }
 
   const handlePersonChange = (event) => {
