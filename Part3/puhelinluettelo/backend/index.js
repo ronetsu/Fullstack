@@ -47,7 +47,6 @@ app.get("/api/persons/:id", (request, response, next) => {
       response.status(404).end(); 
     }
   }).catch(error => next(error))
-  console.log(person.id, typeof person.id, id, typeof id, person.id === id);
 });
 
 app.post("/api/persons", (request, response) => {
@@ -85,11 +84,14 @@ app.delete("/api/persons/:id", (request, response, next) => {
     .catch(error => next(error));
 });
 
-app.get("/info", (request, response) => {
-  response.send(
-    "<p>Phonebook has info for " + persons.length + " people</p>" + new Date()
-  );
+app.get("/info", (request, response, next) => {
+  Person.countDocuments({})
+    .then(count => {
+      response.send(`<p>Phonebook has info for ${count} people</p>` + new Date());
+    })
+    .catch(error => next(error));
 });
+
 
 app.use(unknownEndpoint)
 app.use(errorHandler)
