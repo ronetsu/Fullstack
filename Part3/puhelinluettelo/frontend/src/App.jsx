@@ -71,6 +71,11 @@ const App = () => {
           setNewName('')
           setNewNumber('')
         })
+        .catch(error => {
+          setErrorMessage(`Person validation failed: name: Path 'name' '(${newName})'
+          is shorter than the minimum allowed length (3).`);
+          console.log(error.response.data)
+        })
       }
   }
 

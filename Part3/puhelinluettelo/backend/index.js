@@ -20,6 +20,8 @@ const errorHandler = (error, request, response, next) => {
 
   if(error.name === "CastError") {
     return response.status(400).send({error: "malformatted id"});
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
   }
 
   next(error);
@@ -49,7 +51,7 @@ app.get("/api/persons/:id", (request, response, next) => {
   }).catch(error => next(error))
 });
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
   const body = request.body;
 
   if (!body.name || !body.number) {
@@ -57,23 +59,15 @@ app.post("/api/persons", (request, response) => {
       error: "name or number is missing",
     });
   }
-
-  Person.findOne({ name: body.name }).then((existingPerson) => {
-    if (existingPerson) {
-      return response.status(400).json({
-        error: "name already in phonebook",
-      });
-    } else {
-      const newPerson = new Person({
-        name: body.name,
-        number: body.number,
-        id: Math.floor(Math.random() * 1000),
-      });
-      newPerson.save().then((savedPerson) => {
-        response.json(savedPerson);
-      });
-    }
+  const newPerson = new Person({
+    name: body.name,
+    number: body.number,
+    id: Math.floor(Math.random() * 1000),
   });
+
+  newPerson.save().then((savedPerson) => {
+    response.json(savedPerson);
+  }).catch(error => next(error));
 });
 
 app.delete("/api/persons/:id", (request, response, next) => {
@@ -88,6 +82,19 @@ app.get("/info", (request, response, next) => {
   Person.countDocuments({})
     .then(count => {
       response.send(`<p>Phonebook has info for ${count} people</p>` + new Date());
+    })
+    .catch(error => next(error));
+});
+
+app.put('/api/persons/:id', (request, response, next) => {
+  const {name, number} = request.body;
+
+  Person.findByIdAndUpdate(
+    request.params.id, 
+    {name, number}, 
+    {new: true, runValidators: true, context: 'query'})
+    .then(updatedPerson => {
+      response.json(updatedPerson);
     })
     .catch(error => next(error));
 });
