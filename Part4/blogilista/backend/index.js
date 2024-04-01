@@ -1,4 +1,4 @@
-const app = require('/Users/ronetsu/Documents/Koulu/Fullstack/Part4/blogilista/backend/app.js')
+const app = require('./app')
 const config = require('./utils/config')
 const logger = require('./utils/logger')
 

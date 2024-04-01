@@ -7,8 +7,28 @@ blogsRouter.get('/', (request, response) => {
         })
     })
 
+blogsRouter.get('/:id', (request, response, next) => {
+    Blog.findById(request.params.id)
+        .then(blog => {
+            if (blog) {
+                response.json(blog)
+            } else {
+                response.status(404).end()
+            }
+        })
+        .catch(error => next(error))
+    })
+
 blogsRouter.post('/', (request, response) => {
-    const blog = new Blog(request.body)
+    const body = request.body
+    console.log('body:', body.body)
+
+    const blog = new Blog({
+        title: body.title,
+        author: body.author,
+        url: body.url,
+        likes: body.likes || 0
+    })
 
     blog
         .save()
