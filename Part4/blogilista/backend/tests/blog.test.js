@@ -36,3 +36,20 @@ describe("total likes", () => {
     assert.strictEqual(result, 36)
   } )
 })
+
+describe("favorite blog", () => {
+  test("when the list is bigger", () => {
+    const result = listHelper.favoriteBlog(testBlogs).likes
+    assert.deepStrictEqual(result, 12)
+  })
+
+  test("when the list is empty", () => {
+    const result = listHelper.favoriteBlog([])
+    assert.strictEqual(result, null)
+  })
+
+  test("when the list has multiple favorites", () => {
+    const result = listHelper.favoriteBlog(testBlogs).likes
+    assert.deepStrictEqual(result, 12)
+  })
+})
