@@ -1,7 +1,8 @@
-require("dotenv").config()
+const path = require("path")
+require("dotenv").config({ path: path.resolve(__dirname, "../../.env") })
 
-let PORT = 3001
-let MONGODB_URI = "mongodb+srv://ronjalipsonen:Ukkoliini12@cluster0.km2kn07.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+let PORT = process.env.PORT
+let MONGODB_URI = process.env.MONGODB_URI
 
 module.exports = {
   MONGODB_URI,
