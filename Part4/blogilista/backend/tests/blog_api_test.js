@@ -42,7 +42,7 @@ test("blog identificator is named id", async () => {
   assert.ok(response.body[0].id)
 })
 
-test.only("a valid blog can be added", async () => {
+test("a valid blog can be added", async () => {
   const initialBlogs = await api.get("/api/blogs")
 
   const newBlog =  {
@@ -56,6 +56,19 @@ test.only("a valid blog can be added", async () => {
   const response = await api.get("/api/blogs")
 
   assert.ok(initialBlogs.body.length + 1, response.body.length)
+})
+
+test("likes default to 0 if not specified", async () => {
+  const newBlog = {
+    title: "This is a test blog",
+    author: "Tina Tester",
+    url: "https://en.wikipedia.org/wiki/Test"
+  }
+
+  await api.post("/api/blogs").send(newBlog)
+  const response = await api.get("/api/blogs")
+
+  assert.strictEqual(response.body[response.body.length - 1].likes, 0)
 })
 
 after(async () => {
