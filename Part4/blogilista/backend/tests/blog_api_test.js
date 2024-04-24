@@ -36,6 +36,13 @@ test("a specific blog is within the returned blogs", async () => {
   assert.ok(titles.includes("React patterns"))
 })
 
+test("blog identificator is named id", async () => {
+  const response = await api.get("/api/blogs")
+
+  assert.ok(response.body[0].id)
+
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
