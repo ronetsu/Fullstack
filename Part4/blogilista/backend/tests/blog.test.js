@@ -53,3 +53,20 @@ describe("favorite blog", () => {
     assert.deepStrictEqual(result, 12)
   })
 })
+
+describe("most likes by author", () => {
+  test("when the list is bigger", () => {
+    const result = listHelper.mostLikesByAuthor(testBlogs).likes
+    assert.deepStrictEqual(result, 17)
+  })
+
+  test("when the list is empty", () => {
+    const result = listHelper.mostLikesByAuthor([])
+    assert.strictEqual(result, null)
+  })
+
+  test("when the list has multiple favorites", () => {
+    const result = listHelper.mostLikesByAuthor(testBlogs).likes
+    assert.deepStrictEqual(result, 17)
+  })
+})

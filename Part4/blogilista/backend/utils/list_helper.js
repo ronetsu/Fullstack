@@ -22,6 +22,20 @@ const favoriteBlog = (blogs) => {
     : blogs.reduce(reducer, blogs[0])
 }
 
+const mostLikesByAuthor = (blogs) => {
+  const reducer = (authors, blog) => {
+    const author = authors.find(a => a.author === blog.author)
+    if (author) {
+      author.likes += blog.likes
+    } else {
+      authors.push({ author: blog.author, likes: blog.likes })
+    }
+    return authors
+  }
+  const authors = blogs.reduce(reducer, [])
+  return favoriteBlog(authors)
+}
+
 module.exports = {
-  dummy, totalLikes, favoriteBlog
+  dummy, totalLikes, favoriteBlog, mostLikesByAuthor
 }
